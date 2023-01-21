@@ -1,0 +1,115 @@
+docker build /pathOfImage/            
+	creates image with no name n tag
+docker build -t name:tag /pathOfImage/
+	created image with name and tag
+
+docker run -p localPort:portRunningInContainer imageId/name:tag
+	run command runs the images inside a newly created container
+	-p / --publish is publish portRunningInContainer on localPort
+	imageId is found after image is created
+docker run -d -p localPort:portRunningInContainer imageId/name:tag
+	runs in detached mode
+docker run -i -t imageId/name:tag OR -it imageId/name:tag
+	runs and lets user interact with terminal (listens for STDIN)
+docker run --rm imageId/name:tag
+	runs a container normally... but when stopped... it deletes the container
+docker run --name containerName imageId/name:tag
+	assigns name to container
+
+docker ps
+	list down all running containers
+docker ps -a
+	list down all containers created
+docker images
+	list down all images
+	
+docker stop containerName/containerId
+	containerName is found in docker ps result
+
+docker start existingContainerName/Id
+	starts existing container in detached mode
+docker start -a existingContainerName/Id
+	starts existing container in attached mode (logs to STDOUT)
+docker start -a -i existingContainerName/Id
+	starts existing container in attached mode (logs to STDOUT) and lets user interact with terminal (listens for STDIN)
+
+docker attach existingContainerName/Id
+	opens attached mode (logs to STDOUT) for started container and lets user interact with terminal (listens for STDIN)
+
+docker logs existingContainerName/Id
+	past logs of that container
+docker logs -f existingContainerName/Id
+	past logs and opens in attached mode
+
+docker rm spaceSeparatedStoppedExistingContainerNames
+	deleted these containers
+docker container prune
+	delete all stopped containers
+docker rmi spaceSeparatedImageIds
+	deleted these images (only those images can be deleted whose containers are already deleted)
+docker image prune
+	delete all images (only those images can be deleted whose containers are already deleted)
+
+docker cp relativePathOfSource relativePathOfDest
+	copies files from and to running container
+	docker cp dummy/. runningcontainerName/Id:/test
+		copies all contents from dummy folder of local system to test folder in container (useful for config file changes)
+	docker cp runningcontainerName/Id:/test/. dummy
+		copies all contents from test folder in container to dummy folder of local system (usefull for reading log files)
+
+SHARING IWTH OTHERS
+1. Share Dockerfile
+2. Share Image  
+	docker push imageName/host:name	
+		imageName pushes to Docker Hub, host:name pushes to private registry (host is url for private registry)
+	docker pull imageName/host:name	
+		imageName pull from Docker Hub, host:name pull from private registry (host is url for private registry)
+	docker tag oldName newName
+		change image name - clones old image with newName
+
+VOLUMES - Managed by docker - (Read-write)
+Image - read-only
+Container - adds read-write layer on top of image
+container can store temporary data in its layer until the container is not deleted
+For storing permanent data, we use VOLUMES
+Volumes are the folder on host machine that are mapped to a folder in container
+1- Anonymous Volumes - created when this VOLUME [ "/folderToMapToHost" ] is included in Dockerfile OR -v /folderToMapToHost is included while running the container
+	Deleted automatically when container started with --rm is stopped else not deleted
+	docker volume rm volumeName OR docker volume prune
+	New container creates new Anonymous Volume
+2- Named Volumes - created when "-v volumneName:/folderToMapToHost" is included while running the container
+	Aren't deleted automatically
+	Even after container is deleted with --rm, new container run with same volumneName:/folderToMapToHost can access the older container volume data.
+	useful for backing up logs to machine.
+
+BIND MOUNTS (only for development)- Managed by developer - (Read-write)
+whenever we change our code in development phase...we need to rebuild the image and run the container
+This is solved by BIND MOUNTS.
+BIND MOUNTS are the folder that are synced to our containerworking directory in real time
+created when `-v "hostFolderPath:/folderToMapToHost"` is included while running the container
+when we run data-volumes project container with :-
+	docker run -dp 3000:80 --rm -v feedback-app:/app/feedback -v "D:\docker\data-volumes:/app" --name containerName imageId/imageName
+		runs the container and immediately delete it because of an error
+		-v "D:\docker\data-volumes:/app" flag overwrites the comntents of /app folder in container with the D:\docker\data-volumes local folder
+		D:\docker\data-volumes local folder is missing its node-modules..hence the error
+		so we need to skip the node-modules folder in container while mounting the local to container
+		this is done by Anonymous Volumes
+	docker run -dp 3000:80 --rm -v feedback-app:/app/feedback -v "D:\docker\data-volumes:/app" -v /app/node-modules --name containerName imageId/imageName
+		-v /app/node-modules Anonymous volume will skip the node-modules folder in app 
+		coz the longer path in volumes are evaluated with preference
+	
+	-v "D:\docker\data-volumes:/app:ro" 
+	- :ro at end specifies that bind MOUNT is read only
+
+ENVIRONMENT AND ARGUMENT VARIABLES
+ENVIRONMENT - are passed to docker run command with 
+	--env ENV_VAR1=ENV_VAL1 --env ENV_VAR2=ENV_VAL2  
+	--env-file ./.env
+	ENVIRONMENT are accessible throughout the container (Application code , Dockerfile)
+	ENV ENV_VAR1 ENV_DEFAULT_VAL sets the default value for that env variable, in case its not passed in run command.
+	These ENV_VAR1 are accessible in Dockerfile with $ENV_VAR1 
+ARGUMENT - are passed ot docker build command with	
+	--build-arg ARG_VAR1=ARG_VAL1
+	ARGUMENT are not accessible after the image is created. They are baked into the image.
+	ARG ARG_VAR1 ARG_DEFAULT_VAL sets the default value for that arg variable, in case its not passed in build command.
+	These ARG_VAR1 are accessible in Dockerfile with $ARG_VAR1 
