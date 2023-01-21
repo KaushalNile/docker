@@ -1,0 +1,25 @@
+Cross-comminucation/ Networking
+    1. Container to Internet (WWW) - always allowed
+    2. Container to host service - possible by adding host.docker.internal in URL of host
+        eg: https://localhost:27017/api/endpoint is possible if changed to https://host.docker.internal:27017/api/endpoint
+        host.docker.internal get the IP of host machine... this is managed by docker
+    3. Container to Container - possible by adding the other Container IPAddress in URL
+        eg: https://localhost:27017/api/endpoint is possible if changed to https://172.01.15.21:27017/api/endpoint
+        i. run that other container...
+        ii. docker container inspect otherContainerName
+        iii. copy IPAddress from NetworkSettings object and paste in URL.
+        Drawback - Everytime that other container is run, its IPAddress changes. SO we need to change in URL and re build the image. 
+    Solution - using Container NETWORKS
+
+NETWORKS - these allow multiple container to communicate with each other.
+docker network create networkName
+docker run --name container-1-Name --network networkName image-1-name
+docker run --name container-2-Name --network networkName image-2-name
+    now container-1-Name and container-2-Name will be able to communicate with each other
+    we can add any number of container in a network, just add --network while running those container
+
+    eg: eg: https://localhost:27017/api/endpoint is possible if changed to https://container-2-Name:27017/api/endpoint
+    https://container-2-Name:27017/api/endpoint is accessible in all the other container in that network.
+    docker finds out the IP Address of container in network based on container name
+
+mongodb container stores data in /data/db folder. So to implement named volumes for data persistence, we can use that path. (found of docker hub page of mongo)
