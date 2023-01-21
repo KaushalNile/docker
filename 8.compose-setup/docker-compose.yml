@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo
+    volumes:
+      - data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=practice
+      - MONGO_INITDB_ROOT_PASSWORD=password
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    volumes:
+      - logs:/app/logs # Named Volume
+      - ./backend:/app # Bind Mount
+      - /app/node_modules # Anonymous Volume
+    environment:
+      - MONGODB_USERNAME=practice
+      - MONGODB_PASSWORD=password
+    ports:
+      - '80:80'
+    depends_on:
+      - mongodb
+    container_name: goals-backend
+    
+  frontend:
+    build: ./frontend
+    volumes:
+      - ./frontend/src:/app/src
+    ports:
+      - 3000:3000
+    stdin_open: true
+    tty: true
+    depends_on:
+      - backend
+
+volumes: # Named Volumes used in whole docker-compose file
+  data:
+  logs:
