@@ -1,8 +1,0 @@
-Docker Compose
-To manage multi-container applications (can work with 1 container also).
-Its cumbersome to manually enter build and run and remove commands everytime we code.
-Docker Compose compresses all the commands needed in 1 file. And replaces all the commands required by just 1 command.
--- docker-compose up        
-    by default runs with --rm flag and in attached mode
-   docker-compose up -d
-    detached mode
