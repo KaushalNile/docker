@@ -1,35 +1,40 @@
 Docker Compose
-To manage multi-container applications (can work with 1 container also).
-Its cumbersome to manually enter build and run and remove commands everytime we code.
-Docker Compose compresses all the commands needed in 1 file. And replaces all the commands required by just 1 command.
--- docker-compose up        
-    by default runs with --rm flag and in attached mode
-   docker-compose up -d
-    detached mode
+    To manage multi-container applications (can work with 1 container also).
+    Its cumbersome to manually enter build and run and remove commands everytime we code.
+    Docker Compose compresses all the commands needed in 1 file. And replaces all the commands required by just 1 command.
+    -- docker-compose up        
+        by default runs with --rm flag and in attached mode
+    docker-compose up -d
+        detached mode
+    -- docker-compose down
 
 UTILITY CONTAINERS
-It allows you to complete all of the basic function of managing your containers without having to use the command line interface.
-If we don't have nodeJS installed on host system, we can use UTILITY container to create a node project from scratch.
-Dockerfile contains only the basic stuff like Base Image, Working directory, CMD, Entrypoint.
-Image is created as usual.
-"docker run --rm -it imageName command"
-    "command" overwrites the CMD from Dockerfile and this allows us to run custom commands without installing the tools on host machine.
-    Eg: "docker run --rm -it -v relative/path/to/folder:/app nodeImageName npm init"
-    this will initialize the /app folder in container with a nodeJS project.
-OR
-We can run the container normally and execute below command
-"docker exec -it containerName npm init"
+    It allows you to complete all of the basic function of managing your containers without having to use the command line interface.
+    If we don't have nodeJS installed on host system, we can use UTILITY container to create a node project from scratch.
+    Dockerfile contains only the basic stuff like Base Image, Working directory, CMD, Entrypoint.
+    Image is created as usual.
+    "docker run --rm -it imageName command"
+        "command" overwrites the CMD from Dockerfile and this allows us to run custom commands without installing the tools on host machine.
+        Eg: "docker run --rm -it -v relative/path/to/folder:/app nodeImageName npm init"
+        this will initialize the /app folder in container with a nodeJS project.
+    OR
+    We can run the container normally and execute below command
+    "docker exec -it containerName npm init"
 
 If we want to restrict the custom command access, we can use Entrypoint in Dockerfile
-ENTRYPOINT is just like CMD, custom commands overwrites CMD but appends to ENTRYPOINT
-    Eg: ENTRYPOINT [ "npm" ]
-        build image as usual
-        docker run --rm -it -v relative/path/to/folder:/app nodeImageName init
-        init gets appended to npm from Entrypoint
+    ENTRYPOINT is just like CMD, custom commands overwrites CMD but appends to ENTRYPOINT
+        Eg: ENTRYPOINT [ "npm" ]
+            build image as usual
+            docker run --rm -it -v relative/path/to/folder:/app nodeImageName init
+            init gets appended to npm from Entrypoint
 
-Using Docker-Compose with UTILITY CONTAINERS
-Normal docker-compose file
-"docker-compose up"
-"docker-compose run --rm serviceName command"
+    Using Docker-Compose with UTILITY CONTAINERS
+    Normal docker-compose file
+    "docker-compose up"
+    "docker-compose run --rm serviceName command"
 
-This can be useful to read the log files inside the container
+    This can be useful to read the log files inside the container
+
+docker-compose up --build service1 service2
+    --build flag forces to rebuild the image if anything is changed in Dockerfiles
+    service1 and service2 are multiple services in yaml file, if you want to run selective services.
