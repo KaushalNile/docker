@@ -22,3 +22,13 @@ Deploying to Remote Machine
 By Default EC2 instance accepts traffic from SSH and 22 port
 In order to accept requests from our container that exposes HTTP 80, we need to add a Security Group in EC2 instance that allows traffic from HTTP 80 requests.
 After that we can access our app through Public DNS or Public IPv4 Address.
+
+Deployment of Multi Container App will be using 
+    ECS (Elastic Container Service) for creating and managing the containers
+    EFS (Elastic File System) for volumes in mongodb data persistency
+    EC2 Load Balancer for single DNS and Balancing the load on servers
+
+    1. Create a Cluster
+    2. Create a Task
+    3. Add Containers in Task (Configure EC2 Load Balancer, EFS in this stage)
+    4. Create a Service for Task
