@@ -50,7 +50,7 @@ Run React SPA Container
 ---------------------
 
 docker run --name goals-frontend \
-  -v /Users/maximilianschwarzmuller/development/teaching/udemy/docker-complete/frontend/src:/app/src \
+  -v D:\docker-practice\8.compose-setup\frontend\src:/app/src \
   --rm \
   -d \
   -p 3000:3000 \
